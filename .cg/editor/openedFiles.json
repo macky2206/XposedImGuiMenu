@@ -1,0 +1,21 @@
+{
+  "allFiles": [
+    {
+      "file": "/storage/emulated/0/CodeOnTheGoProjects/XposedImGuiMenu-1/app/.cxx/Debug/6j17zzu4/arm64-v8a/CMakeCache.txt",
+      "selection": {
+        "end": {
+          "column": 0,
+          "index": 0,
+          "line": 0
+        },
+        "start": {
+          "column": 0,
+          "index": 0,
+          "line": 0
+        }
+      }
+    }
+  ],
+  "projectPath": "/storage/emulated/0/CodeOnTheGoProjects/XposedImGuiMenu-1",
+  "selectedFile": "/storage/emulated/0/CodeOnTheGoProjects/XposedImGuiMenu-1/app/.cxx/Debug/6j17zzu4/arm64-v8a/CMakeCache.txt"
+}
