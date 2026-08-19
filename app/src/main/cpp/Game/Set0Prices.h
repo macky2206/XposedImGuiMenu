@@ -1,13 +1,5 @@
 #pragma once
 
-#include "Include/GlobalNamespace/CostAttribute.hpp"
-#include "Include/GlobalNamespace/SkillAttribute.hpp"
-#include "Include/GlobalNamespace/SkillContent.hpp"
-#include "Include/GlobalNamespace/SkillUI.hpp"
-#include "Include/GlobalNamespace/StatContent.hpp"
-#include "Include/GlobalNamespace/StatUI.hpp"
-#include "Include/UnityEngine/Object.hpp"
-
 #include <vector>
 
 #include <unordered_map>
