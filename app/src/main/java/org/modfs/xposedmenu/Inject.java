@@ -1,53 +1,78 @@
 package org.modfs.xposedmenu;
 
-import android.content.pm.ApplicationInfo;
 import android.os.Build;
+import android.os.Bundle;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.Objects;
 
-import de.robv.android.xposed.IXposedHookZygoteInit;
+import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedHelpers;
+import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam;
 
-public class Inject implements IXposedHookZygoteInit  {
+public class Inject implements IXposedHookLoadPackage {
     boolean loaded = false;
     String app_name = "com.frivolition.daysbygone"; // target package to inject
     String target_abi = Build.SUPPORTED_ABIS[0]; // SET THIS TO THE ABI YOU'RE TARGETING
+
     public static InputStream resourceStream(String name) {
         return Objects.requireNonNull(Inject.class.getClassLoader()).getResourceAsStream(name);
     }
 
+    // Declare the native method to pass the Activity context to C++
+    public static native void startModMenu(Object activityContext);
+
     @Override
-    public void initZygote(StartupParam startupParam) throws Throwable {
-        XposedHelpers.findAndHookMethod(Class.forName("android.app.LoadedApk"), "createAppFactory", ApplicationInfo.class,
-                ClassLoader.class, new XC_MethodHook() {
-            @Override
-            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                ApplicationInfo ai = (ApplicationInfo)param.args[0];
-                ClassLoader cl = (ClassLoader)param.args[1];
-                if (ai.toString().contains(app_name) && cl != null) {
-                    if (!loaded) {
-                        // load our menu before anything else, this is EXTREMELY fast so it might break lol
-                        String pathname = "/data/user/0/" + app_name + "/cache/libxposedmenu.so";
-                        File soFile = new File(pathname);
+    public void handleLoadPackage(LoadPackageParam lpparam) throws Throwable {
+        // Only proceed if the package matches the target game
+        if (!lpparam.packageName.equals(app_name)) {
+            return;
+        }
 
-                        // NOTE: The ABI set has to be the one that the app uses
-                        InputStream soFileStream = resourceStream("lib/" + target_abi + "/libxposedmenu.so");
+        // Hook UnityPlayerActivity's onCreate method
+        XposedHelpers.findAndHookMethod(
+                "com.unity3d.player.UnityPlayerActivity",
+                lpparam.classLoader,
+                "onCreate",
+                Bundle.class,
+                new XC_MethodHook() {
+                    @Override
+                    protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                        if (!loaded) {
+                            // Extract the .so file to the app's cache directory
+                            String pathname = "/data/user/0/" + app_name + "/cache/libxposedmenu.so";
+                            File soFile = new File(pathname);
 
-                        byte[] soFileContent = new byte[soFileStream.available()];
-                        soFileStream.read(soFileContent);
-                        soFile.createNewFile();
-                        FileOutputStream out = new FileOutputStream(soFile);
-                        out.write(soFileContent);
-                        XposedHelpers.callStaticMethod(XposedHelpers.findClass("java.lang.Runtime", cl), "nativeLoad", pathname, cl);
-                        loaded = true;
+                            InputStream soFileStream = resourceStream("lib/" + target_abi + "/libxposedmenu.so");
+                            if (soFileStream != null) {
+                                byte[] soFileContent = new byte[soFileStream.available()];
+                                soFileStream.read(soFileContent);
+                                
+                                if (!soFile.exists()) {
+                                    soFile.createNewFile();
+                                }
+                                
+                                FileOutputStream out = new FileOutputStream(soFile);
+                                out.write(soFileContent);
+                                out.flush();
+                                out.close();
+                                soFileStream.close();
+
+                                // Load the library natively instead of using reflection hacks
+                                System.load(pathname);
+                                
+                                // param.thisObject is the UnityPlayerActivity instance.
+                                // Pass it to C++ so BNM has a non-null context to use.
+                                startModMenu(param.thisObject);
+                                
+                                loaded = true;
+                            }
+                        }
                     }
                 }
-                super.beforeHookedMethod(param);
-            }
-        });
+        );
     }
 }

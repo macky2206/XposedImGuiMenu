@@ -81,3 +81,37 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         LOGE("can't create thread: %s\n", strerror(ret));
     return JNI_VERSION_1_6;
 }
+
+// ... [Leave hook_eglSwapBuffers and hack_thread exactly as they are] ...
+
+// 1. Modified JNI_OnLoad: Only keep the JVM setup
+JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
+    JNIEnv *env;
+    jvm = vm; // Store the JavaVM globally
+    vm->GetEnv((void **) &env, JNI_VERSION_1_6);
+
+    // REMOVED BNM::Loading and pthread_create from here.
+    // They will execute in the startModMenu bridge instead.
+
+    return JNI_VERSION_1_6;
+}
+
+// 2. Added JNI Bridge: This catches the Activity from Inject.java
+extern "C"
+JNIEXPORT void JNICALL
+Java_org_modfs_xposedmenu_Inject_startModMenu(JNIEnv *env, jclass clazz, jobject activityContext) {
+    
+    // Load BNM safely using the valid activity object
+    BNM::Loading::TryLoadByJNI(env, activityContext);
+
+    // Find the Unity classes using the active ClassLoader
+    UnityPlayer_cls = env->FindClass("com/unity3d/player/UnityPlayer");
+    UnityPlayer_CurrentActivity_fid = env->GetStaticFieldID(UnityPlayer_cls, "currentActivity", "Landroid/app/Activity;");
+
+    // Start the hack thread now that BNM is loaded and context is valid
+    int ret;
+    pthread_t ntid;
+    if ((ret = pthread_create(&ntid, nullptr, hack_thread, nullptr))) {
+        LOGE("can't create thread: %s\n", strerror(ret));
+    }
+}

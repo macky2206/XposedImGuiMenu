@@ -1,21 +1,36 @@
 {
   "allFiles": [
     {
-      "file": "/storage/emulated/0/CodeOnTheGoProjects/XposedImGuiMenu-1/app/.cxx/Debug/6j17zzu4/arm64-v8a/CMakeCache.txt",
+      "file": "/storage/emulated/0/proj/XposedImGuiMenu/.github/workflows/build.yml",
       "selection": {
         "end": {
           "column": 0,
-          "index": 0,
-          "line": 0
+          "index": 899,
+          "line": 41
         },
         "start": {
           "column": 0,
-          "index": 0,
-          "line": 0
+          "index": 899,
+          "line": 41
+        }
+      }
+    },
+    {
+      "file": "/storage/emulated/0/proj/XposedImGuiMenu/app/src/main/java/org/modfs/xposedmenu/Inject.java",
+      "selection": {
+        "end": {
+          "column": 0,
+          "index": 3351,
+          "line": 78
+        },
+        "start": {
+          "column": 0,
+          "index": 3351,
+          "line": 78
         }
       }
     }
   ],
-  "projectPath": "/storage/emulated/0/CodeOnTheGoProjects/XposedImGuiMenu-1",
-  "selectedFile": "/storage/emulated/0/CodeOnTheGoProjects/XposedImGuiMenu-1/app/.cxx/Debug/6j17zzu4/arm64-v8a/CMakeCache.txt"
+  "projectPath": "/storage/emulated/0/proj/XposedImGuiMenu",
+  "selectedFile": "/storage/emulated/0/proj/XposedImGuiMenu/app/src/main/java/org/modfs/xposedmenu/Inject.java"
 }

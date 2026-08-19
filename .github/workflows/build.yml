@@ -30,12 +30,12 @@ jobs:
       run: chmod +x gradlew
 
     - name: Build Debug & Release APKs
-      run: ./gradlew assembleDebug
+      run: ./gradlew assembleDebug assembleRelease
 
     - name: Find and Upload APK Artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: build-apks
+        name: built-apk
         path: |
           app/build/outputs/apk/debug/*.apk
           app/build/outputs/apk/release/*.apk
