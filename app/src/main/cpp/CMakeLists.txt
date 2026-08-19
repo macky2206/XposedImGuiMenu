@@ -28,7 +28,7 @@ include_directories(
         ${BNM_INCLUDE_DIRECTORIES}
         libraries/KittyMemory/KittyMemory
         libraries/KittyMemory/Deps/Keystone/include
-        libraries/Dobby/include
+        libraries/Dobby/
         compiled_libs/curl/${CMAKE_ANDROID_ARCH_ABI}/include/curl
         compiled_libs/openssl/${CMAKE_ANDROID_ARCH_ABI}/include/openssl
 )
