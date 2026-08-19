@@ -6,7 +6,6 @@ aux_source_directory(libraries/ImGui imgui-src)
 aux_source_directory(libraries/KittyMemory/KittyMemory kittymemory-src)
 
 add_subdirectory(libraries/KittyMemory/Deps/keystone EXCLUDE_FROM_ALL)
-add_subdirectory(libraries/Dobby EXCLUDE_FROM_ALL)
 add_subdirectory(libraries/BNM-Android EXCLUDE_FROM_ALL)
 get_property(BNM_INCLUDE_DIRECTORIES TARGET BNM PROPERTY BNM_INCLUDE_DIRECTORIES)
 
