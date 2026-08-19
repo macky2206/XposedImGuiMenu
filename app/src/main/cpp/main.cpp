@@ -84,14 +84,31 @@ extern "C"
 JNIEXPORT void JNICALL
 Java_org_modfs_xposedmenu_Inject_startModMenu(JNIEnv *env, jclass clazz, jobject activityContext) {
     
-    // Load BNM safely using the valid activity object
+    // 1. Initialize ByNameModding (BNM)
     BNM::Loading::TryLoadByJNI(env, activityContext);
 
-    // Find the Unity classes using the active ClassLoader
-    UnityPlayer_cls = env->FindClass("com/unity3d/player/UnityPlayer");
-    UnityPlayer_CurrentActivity_fid = env->GetStaticFieldID(UnityPlayer_cls, "currentActivity", "Landroid/app/Activity;");
+    // 2. Get the target game's ClassLoader from the activity instance
+    jclass activityClass = env->GetObjectClass(activityContext);
+    jmethodID getClassLoaderMethod = env->GetMethodID(activityClass, "getClassLoader", "()Ljava/lang/ClassLoader;");
+    jobject targetClassLoader = env->CallObjectMethod(activityContext, getClassLoaderMethod);
 
-    // Start the hack thread now that BNM is loaded and context is valid
+    // 3. Use ClassLoader.loadClass() to find UnityPlayer in the game process
+    jclass classLoaderClass = env->FindClass("java/lang/ClassLoader");
+    jmethodID loadClassMethod = env->GetMethodID(classLoaderClass, "loadClass", "(Ljava/lang/String;)Ljava/lang/Class;");
+
+    jstring unityClassName = env->NewStringUTF("com.unity3d.player.UnityPlayer");
+    jclass localUnityPlayerCls = (jclass) env->CallObjectMethod(targetClassLoader, loadClassMethod, unityClassName);
+    env->DeleteLocalRef(unityClassName);
+
+    // 4. Resolve currentActivity if UnityPlayer was found
+    if (localUnityPlayerCls != nullptr) {
+        UnityPlayer_cls = (jclass) env->NewGlobalRef(localUnityPlayerCls);
+        UnityPlayer_CurrentActivity_fid = env->GetStaticFieldID(UnityPlayer_cls, "currentActivity", "Landroid/app/Activity;");
+    } else {
+        LOGE("Failed to find com.unity3d.player.UnityPlayer using target ClassLoader!");
+    }
+
+    // 5. Spawn your hack thread
     int ret;
     pthread_t ntid;
     if ((ret = pthread_create(&ntid, nullptr, hack_thread, nullptr))) {
