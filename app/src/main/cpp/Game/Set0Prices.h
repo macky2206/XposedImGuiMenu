@@ -1,5 +1,6 @@
 #pragma once
 
+#include <BNM/Il2CppHeaders.hpp>
 #include <vector>
 
 #include <unordered_map>
@@ -166,7 +167,8 @@ struct SkillUI : BNM::UnityEngine::MonoBehaviour {
                 if (map.find(cost) == map.end()) {
                     map[cost] = Features::set0Prices::DefaultCost{
                             cost->baseValue(),
-                            cost->valueIncrement()};
+                            cost->valueIncrement(
+                            )};
                 }
                 if (Features::set0Prices::isEnabled) {
                     cost->set_baseValue(0.0);
