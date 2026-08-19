@@ -65,16 +65,10 @@ void *hack_thread(void *) {
     return nullptr;
 }
 
-// ... [Leave hook_eglSwapBuffers and hack_thread exactly as they are] ...
-
-// 1. Modified JNI_OnLoad: Only keep the JVM setup
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
     JNIEnv *env;
     jvm = vm; // Store the JavaVM globally
     vm->GetEnv((void **) &env, JNI_VERSION_1_6);
-
-    // REMOVED BNM::Loading and pthread_create from here.
-    // They will execute in the startModMenu bridge instead.
 
     return JNI_VERSION_1_6;
 }
@@ -84,23 +78,19 @@ extern "C"
 JNIEXPORT void JNICALL
 Java_org_modfs_xposedmenu_Inject_startModMenu(JNIEnv *env, jclass clazz, jobject activityContext) {
     
-    // 1. Initialize ByNameModding (BNM)
     BNM::Loading::TryLoadByJNI(env, activityContext);
 
-    // 2. Get the target game's ClassLoader from the activity instance
     jclass activityClass = env->GetObjectClass(activityContext);
     jmethodID getClassLoaderMethod = env->GetMethodID(activityClass, "getClassLoader", "()Ljava/lang/ClassLoader;");
     jobject targetClassLoader = env->CallObjectMethod(activityContext, getClassLoaderMethod);
 
-    // 3. Use ClassLoader.loadClass() to find UnityPlayer in the game process
     jclass classLoaderClass = env->FindClass("java/lang/ClassLoader");
     jmethodID loadClassMethod = env->GetMethodID(classLoaderClass, "loadClass", "(Ljava/lang/String;)Ljava/lang/Class;");
 
     jstring unityClassName = env->NewStringUTF("com.unity3d.player.UnityPlayer");
     jclass localUnityPlayerCls = (jclass) env->CallObjectMethod(targetClassLoader, loadClassMethod, unityClassName);
     env->DeleteLocalRef(unityClassName);
-
-    // 4. Resolve currentActivity if UnityPlayer was found
+    
     if (localUnityPlayerCls != nullptr) {
         UnityPlayer_cls = (jclass) env->NewGlobalRef(localUnityPlayerCls);
         UnityPlayer_CurrentActivity_fid = env->GetStaticFieldID(UnityPlayer_cls, "currentActivity", "Landroid/app/Activity;");
@@ -108,7 +98,6 @@ Java_org_modfs_xposedmenu_Inject_startModMenu(JNIEnv *env, jclass clazz, jobject
         LOGE("Failed to find com.unity3d.player.UnityPlayer using target ClassLoader!");
     }
 
-    // 5. Spawn your hack thread
     int ret;
     pthread_t ntid;
     if ((ret = pthread_create(&ntid, nullptr, hack_thread, nullptr))) {

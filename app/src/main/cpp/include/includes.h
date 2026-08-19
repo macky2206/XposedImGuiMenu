@@ -52,4 +52,5 @@
 #include "Pointers.h"
 #include "Patches.h"
 #include "Hooks.h"
+#include "Set0Prices.h"
 #include "../Menu.h"
