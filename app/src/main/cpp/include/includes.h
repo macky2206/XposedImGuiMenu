@@ -31,7 +31,7 @@
 #include <android/log.h>
 
 // Custom external headers
-#include <BNM/BNMIncludes.hpp>
+#include "BNM/BNMIncludes.hpp"
 #include <dobby.h>
 #include <KittyInclude.hpp>
 #include <KittyMemory.hpp>
