@@ -65,23 +65,6 @@ void *hack_thread(void *) {
     return nullptr;
 }
 
-JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
-    JNIEnv *env;
-    jvm = vm;
-    vm->GetEnv((void **) &env, JNI_VERSION_1_6);
-
-    BNM::Loading::TryLoadByJNI(env); // BNM loading, comment this out if you don't use BNM
-
-    UnityPlayer_cls = env->FindClass("com/unity3d/player/UnityPlayer");
-    UnityPlayer_CurrentActivity_fid = env->GetStaticFieldID(UnityPlayer_cls, "currentActivity", "Landroid/app/Activity;");
-
-    int ret;
-    pthread_t ntid;
-    if ((ret = pthread_create(&ntid, nullptr, hack_thread, nullptr)))
-        LOGE("can't create thread: %s\n", strerror(ret));
-    return JNI_VERSION_1_6;
-}
-
 // ... [Leave hook_eglSwapBuffers and hack_thread exactly as they are] ...
 
 // 1. Modified JNI_OnLoad: Only keep the JVM setup
