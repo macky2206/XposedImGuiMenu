@@ -34,12 +34,27 @@ EGLBoolean hook_eglSwapBuffers(EGLDisplay dpy, EGLSurface surface) {
     return old_eglSwapBuffers(dpy, surface);
 }
 
-void *hack_thread(void *) {
+void *hack_thread(void *arg) {
+    // 1. Cast the passed argument back to jobject
+    jobject globalContext = (jobject)arg;
+
+    // 2. Wait for IL2CPP to load into memory
     do {
         sleep(1);
         g_il2cppBaseMap = KittyMemory::getElfBaseMap("libil2cpp.so");
     } while (!g_il2cppBaseMap.isValid());
 
+    // 3. Attach this background thread to the JVM to get a valid JNIEnv
+    JNIEnv *env;
+    jvm->AttachCurrentThread(&env, nullptr);
+
+    // 4. NOW initialize BNM (it will succeed because libil2cpp is in memory)
+    BNM::Loading::TryLoadByJNI(env, globalContext);
+    
+    // 5. Clean up the global reference to prevent memory leaks
+    env->DeleteGlobalRef(globalContext);
+
+    // 6. Original logic: Wait for Unity
     do {
         sleep(1);
         unityMaps = ElfScanner::createWithPath("libunity.so");
@@ -62,6 +77,9 @@ void *hack_thread(void *) {
 
     LOGI("Menu finished loading");
 
+    // 7. Detach thread from JVM before exiting
+    jvm->DetachCurrentThread();
+
     return nullptr;
 }
 
@@ -73,13 +91,13 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
     return JNI_VERSION_1_6;
 }
 
-// 2. Added JNI Bridge: This catches the Activity from Inject.java
 extern "C"
 JNIEXPORT void JNICALL
 Java_org_modfs_xposedmenu_Inject_startModMenu(JNIEnv *env, jclass clazz, jobject activityContext) {
     
-    BNM::Loading::TryLoadByJNI(env, activityContext);
+    // Note: BNM::Loading::TryLoadByJNI has been moved to hack_thread.
 
+    // 1. Resolve UnityPlayer class using the target app's ClassLoader
     jclass activityClass = env->GetObjectClass(activityContext);
     jmethodID getClassLoaderMethod = env->GetMethodID(activityClass, "getClassLoader", "()Ljava/lang/ClassLoader;");
     jobject targetClassLoader = env->CallObjectMethod(activityContext, getClassLoaderMethod);
@@ -98,9 +116,13 @@ Java_org_modfs_xposedmenu_Inject_startModMenu(JNIEnv *env, jclass clazz, jobject
         LOGE("Failed to find com.unity3d.player.UnityPlayer using target ClassLoader!");
     }
 
+    // 2. Create a Global Reference of the Activity context to pass to the new thread
+    jobject globalContext = env->NewGlobalRef(activityContext);
+
+    // 3. Start the hack thread and pass the globalContext as the 4th argument
     int ret;
     pthread_t ntid;
-    if ((ret = pthread_create(&ntid, nullptr, hack_thread, nullptr))) {
+    if ((ret = pthread_create(&ntid, nullptr, hack_thread, (void*)globalContext))) {
         LOGE("can't create thread: %s\n", strerror(ret));
     }
 }
