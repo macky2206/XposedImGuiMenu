@@ -82,11 +82,11 @@ namespace Features {
         }
 
         void initHook() {
-            auto FirstRuneFusionMethod = BNM::Class("", "RuneDirectory").GetMethod("GKMCFIBOLDE");
-            auto SecondRuneFusionMethod = BNM::Class("", "RuneDirectory").GetMethod("BPLFGPOHEBN");
-            auto RuneCloneMethod = BNM::Class("", "RuneDirectory").GetMethod("KNOFHCMOIMF");
-            auto HeroAscensionMethod = BNM::Class("", "HeroDirectory").GetMethod("PIICFHCDDOA");
-            auto HeroSkillsMethod = BNM::Class("", "HeroSkillTree").GetMethod("ACJLHOLNJKP");
+            auto FirstRuneFusionMethod = BNM::Class("", "RuneDirectory").GetMethod("gdh");
+            auto SecondRuneFusionMethod = BNM::Class("", "RuneDirectory").GetMethod("gdi");
+            auto RuneCloneMethod = BNM::Class("", "RuneDirectory").GetMethod("gdd");
+            auto HeroAscensionMethod = BNM::Class("", "HeroDirectory").GetMethod("gaj");
+            auto HeroSkillsMethod = BNM::Class("", "HeroSkillTree").GetMethod("jst");
 
             auto firstRuneFusionHook = BasicHook(FirstRuneFusionMethod.GetOffset(), hook_RuneFusionCosts_1, orig_RuneFusionCosts_1);
             if (firstRuneFusionHook) {

@@ -21,7 +21,7 @@ void DrawMenu() {
         if (Button("Close")) {
             showMenu = false;
         }
-        Checkbox("Change something", &some_feature);
+        Checkbox("Set 0 Prices", &Features::Set0Prices::isEnabled);
     }
     End();
 }
