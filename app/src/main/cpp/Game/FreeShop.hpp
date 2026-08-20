@@ -29,7 +29,7 @@ namespace Features {
 
             BasicHook(g_PurchaseItemMethod.GetOffset(), hooked_PurchaseItem, orig_PurchaseItem);
 
-            BNM_LOG_INFO(OBFUSCATE("FreeShop feature initialized"));
+            BNM_LOG_INFO("FreeShop feature initialized");
         }
     }// namespace FreeShop
 }// namespace Features
