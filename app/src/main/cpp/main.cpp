@@ -67,9 +67,11 @@ void *hack_thread(void *) {
         LOGE("[BNM Debug] Failed to attach thread to JVM.");
     }
 
-    // 3. Configure BNM to use KittyMemory's global base map directly
+    // 3. Create an ElfScanner using the base address to handle symbol lookups for BNM
+    static ElfScanner il2cppScanner = ElfScanner::createWithMap(g_il2cppBaseMap);
+
     BNM::Loading::SetMethodFinder([](const char *name, void *) -> void* {
-        return (void *)g_il2cppBaseMap.findSymbol(name);
+        return (void *)il2cppScanner.findSymbol(name);
     }, nullptr);
 
     BNM::Loading::AllowLateInitHook();
@@ -110,6 +112,7 @@ void *hack_thread(void *) {
 
     return nullptr;
 }
+
 
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
     JNIEnv *env;
