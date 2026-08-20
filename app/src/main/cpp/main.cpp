@@ -88,6 +88,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
     vm->GetEnv((void **) &env, JNI_VERSION_1_6);
     
     BNM::Loading::AddOnLoadedEvent(OnBNMLoaded);
+    BNM::Loading::AllowLateInitHook();
     BNM::Loading::TryLoadByJNI(env);
 
     return JNI_VERSION_1_6;
