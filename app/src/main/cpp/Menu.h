@@ -17,11 +17,8 @@ void DrawMenu() {
     static bool showMenu = true;
     SetNextWindowSize(ImVec2(400, 400), ImGuiCond_FirstUseEver);
     if (Begin("Menu", &showMenu)) {
-        Text("Hello, world!");
-        if (Button("Close")) {
-            showMenu = false;
-        }
-        Checkbox("Set 0 Prices", &Features::Set0Prices::isEnabled);
+        Checkbox("Free Shopping", &Features::freeShop::isEnabled);
+        Checkbox("Set 0 Prices", &Features::set0Prices::isEnabled);
     }
     End();
 }

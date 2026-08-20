@@ -52,5 +52,6 @@
 #include "Pointers.h"
 #include "Patches.h"
 #include "Hooks.h"
+#include "FreeShop.hpp"
 #include "Set0Prices.hpp"
 #include "../Menu.h"

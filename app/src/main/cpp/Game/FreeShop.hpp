@@ -9,7 +9,7 @@ public void FJKEDCNLOAK() { } // COMPLETE PURCHASE
 */
 
 namespace Features {
-    namespace FreeShop {
+    namespace freeShop {
         bool isEnabled = false;
         BNM::Method<void> g_PurchaseItemMethod;
         BNM::Method<void> g_CompletePurchaseMethod;
@@ -24,8 +24,8 @@ namespace Features {
         }
 
         void initHook() {
-            g_PurchaseItemMethod = BNM::Class("", "StorePurchase").GetMethod("FBCOAEGAFIB");
-            g_CompletePurchaseMethod = BNM::Class("", "StorePurchase").GetMethod("FJKEDCNLOAK");
+            g_PurchaseItemMethod = BNM::Class("", "StorePurchase").GetMethod("njk");
+            g_CompletePurchaseMethod = BNM::Class("", "StorePurchase").GetMethod("njl");
 
             BasicHook(g_PurchaseItemMethod.GetOffset(), hooked_PurchaseItem, orig_PurchaseItem);
 
