@@ -49,13 +49,41 @@ void OnBNMLoaded() {
 
     BNM_LOG_INFO("=========================================");
 }
-/*
+
 void *hack_thread(void *) {
+    // 1. Wait for KittyMemory to find libil2cpp.so
     do {
         sleep(1);
         g_il2cppBaseMap = KittyMemory::getElfBaseMap("libil2cpp.so");
     } while (!g_il2cppBaseMap.isValid());
 
+    BNM_LOG_INFO("[BNM Debug] libil2cpp.so found via KittyMemory!");
+
+    // 2. Attach this background thread to the JVM so BNM has a valid JNI environment
+    JNIEnv *env;
+    if (jvm->AttachCurrentThread(&env, nullptr) == JNI_OK) {
+        BNM_LOG_INFO("[BNM Debug] Thread attached to JVM successfully.");
+    } else {
+        LOGE("[BNM Debug] Failed to attach thread to JVM.");
+    }
+
+    // 3. Configure BNM to use KittyMemory's ELF base map instead of paths or handles
+    BNM::Loading::SetMethodFinder([](const char *name, void *data) -> void* {
+        auto *map = (ElfMap *)data;
+        return (void *)map->findSymbol(name);
+    }, (void *)&g_il2cppBaseMap);
+
+    BNM::Loading::AllowLateInitHook();
+    BNM::Loading::TryLoadByUsersFinder();
+
+    // 4. Wait for BNM to finish loading
+    do {
+        sleep(1);
+    } while (!BNM::IsLoaded());
+
+    BNM_LOG_INFO("[BNM Debug] BNM is fully loaded and ready!");
+
+    // 5. Scan for libunity.so
     do {
         sleep(1);
         unityMaps = ElfScanner::createWithPath("libunity.so");
@@ -78,9 +106,13 @@ void *hack_thread(void *) {
 
     LOGI("Menu finished loading");
 
+    // 6. Cleanly detach the thread from the JVM before exiting
+    jvm->DetachCurrentThread();
+
     return nullptr;
 }
-*/
+
+/*
 void *hack_thread(void *arg) {
     BNM_LOG_INFO("[BNM Debug] Hack thread started, waiting for libil2cpp.so...");
 
@@ -135,7 +167,7 @@ void *hack_thread(void *arg) {
     jvm->DetachCurrentThread();
     return nullptr;
 }
-
+*/
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
     JNIEnv *env;
     jvm = vm; // Store the JavaVM globally
