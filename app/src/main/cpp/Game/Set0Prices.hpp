@@ -1,12 +1,12 @@
 #pragma once
 
-#include "SDK/CostAttribute.hpp"
-#include "SDK/SkillAttribute.hpp"
-#include "SDK/SkillContent.hpp"
-#include "SDK/SkillUI.hpp"
-#include "SDK/StatContent.hpp"
-#include "SDK/StatUI.hpp"
-#include "SDK/UnityEngine/Object.hpp"
+#include "SDK/CostAttribute.h"
+#include "SDK/SkillAttribute.h"
+#include "SDK/SkillContent.h"
+#include "SDK/SkillUI.h"
+#include "SDK/StatContent.h"
+#include "SDK/StatUI.h"
+#include "SDK/UnityEngine/Object.h"
 
 #include <vector>
 
