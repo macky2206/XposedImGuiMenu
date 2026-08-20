@@ -166,7 +166,7 @@ struct SkillUI : BNM::UnityEngine::MonoBehaviour {
 
     void LateUpdate() {
         auto thiz = (GlobalNamespace::SkillUI *) this;
-        auto content = (GlobalNamespace::SkillContent *) thiz->JHGKHAFAMMB();
+        auto content = (GlobalNamespace::SkillContent *) thiz->content();
         if (content != nullptr) {
             auto cost = (GlobalNamespace::CostAttribute *) content->cost();
             if (cost != nullptr) {
