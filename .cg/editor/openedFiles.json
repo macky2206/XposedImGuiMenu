@@ -1,0 +1,66 @@
+{
+  "allFiles": [
+    {
+      "file": "/storage/emulated/0/proj/XposedImGuiMenu/app/src/main/cpp/include/includes.h",
+      "selection": {
+        "end": {
+          "column": 29,
+          "index": 651,
+          "line": 33
+        },
+        "start": {
+          "column": 29,
+          "index": 651,
+          "line": 33
+        }
+      }
+    },
+    {
+      "file": "/storage/emulated/0/proj/XposedImGuiMenu/app/src/main/cpp/libraries/BNM-Android/include/BNM/BNMIncludes.hpp",
+      "selection": {
+        "end": {
+          "column": 24,
+          "index": 735,
+          "line": 23
+        },
+        "start": {
+          "column": 24,
+          "index": 735,
+          "line": 23
+        }
+      }
+    },
+    {
+      "file": "/storage/emulated/0/proj/XposedImGuiMenu/app/src/main/cpp/CMakeLists.txt",
+      "selection": {
+        "end": {
+          "column": 24,
+          "index": 944,
+          "line": 30
+        },
+        "start": {
+          "column": 24,
+          "index": 944,
+          "line": 30
+        }
+      }
+    },
+    {
+      "file": "/storage/emulated/0/proj/XposedImGuiMenu/app/src/main/cpp/libraries/BNM-Android/include/BNM/UserSettings/GlobalSettings.hpp",
+      "selection": {
+        "end": {
+          "column": 28,
+          "index": 4293,
+          "line": 123
+        },
+        "start": {
+          "column": 28,
+          "index": 4293,
+          "line": 123
+        }
+      }
+    }
+  ],
+  "projectPath": "/storage/emulated/0/proj/XposedImGuiMenu",
+  "selectedFile": "/storage/emulated/0/proj/XposedImGuiMenu/app/src/main/cpp/libraries/BNM-Android/include/BNM/UserSettings/GlobalSettings.hpp"
+}
