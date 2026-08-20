@@ -1,6 +1,13 @@
 #pragma once
 
-#include <BNM/Il2CppHeaders.hpp>
+#include "SDK/CostAttribute.hpp"
+#include "SDK/SkillAttribute.hpp"
+#include "SDK/SkillContent.hpp"
+#include "SDK/SkillUI.hpp"
+#include "SDK/StatContent.hpp"
+#include "SDK/StatUI.hpp"
+#include "SDK/UnityEngine/Object.hpp"
+
 #include <vector>
 
 #include <unordered_map>
@@ -13,11 +20,11 @@ namespace Features {
             double baseValue;
             double valueIncrement;
         };
-        inline std::unordered_map<BNM::IL2CPP::Il2CppObject *, DefaultCost> defaultValues;
+        inline std::unordered_map<GlobalNamespace::CostAttribute *, DefaultCost> defaultValues;
         // Store original values for SkillAttribute instances (e.g. Spell_Cooldown_Reduction)
-        inline std::unordered_map<BNM::IL2CPP::Il2CppObject *, DefaultCost> defaultSkillValues;
+        inline std::unordered_map<GlobalNamespace::SkillAttribute *, DefaultCost> defaultSkillValues;
         // Collected SkillAttribute instances (active or inactive)
-        inline std::vector<BNM::IL2CPP::Il2CppObject *> skillAttributes;
+        inline std::vector<GlobalNamespace::SkillAttribute *> skillAttributes;
 
         // RuneDirectory.GKMCFIBOLDE(int MBHCFFAKMAI, int JHJMOMGKGCI)
     	// private int GKMCFIBOLDE(int MBHCFFAKMAI, int JHJMOMGKGCI) { }
@@ -124,10 +131,10 @@ struct StatUI : BNM::UnityEngine::MonoBehaviour {
                     BNM::Defaults::Get<BNM::UnityEngine::MonoBehaviour>(), {});
 
     void LateUpdate() {
-        auto thiz = (BNM::IL2CPP::Il2CppObject *) this;
-        auto content = (BNM::IL2CPP::Il2CppObject *) thiz->content();
+        auto thiz = (GlobalNamespace::StatUI *) this;
+        auto content = (GlobalNamespace::StatContent *) thiz->content();
         if (content != nullptr) {
-            auto cost = (BNM::IL2CPP::Il2CppObject *) content->cost();
+            auto cost = (GlobalNamespace::CostAttribute *) content->cost();
             if (cost != nullptr) {
                 auto &map = Features::set0Prices::defaultValues;
                 if (map.find(cost) == map.end()) {
@@ -158,17 +165,16 @@ struct SkillUI : BNM::UnityEngine::MonoBehaviour {
                     BNM::Defaults::Get<BNM::UnityEngine::MonoBehaviour>(), {});
 
     void LateUpdate() {
-        auto thiz = (BNM::IL2CPP::Il2CppObject *) this;
-        auto content = (BNM::IL2CPP::Il2CppObject *) thiz->JHGKHAFAMMB();
+        auto thiz = (GlobalNamespace::SkillUI *) this;
+        auto content = (GlobalNamespace::SkillContent *) thiz->JHGKHAFAMMB();
         if (content != nullptr) {
-            auto cost = (BNM::IL2CPP::Il2CppObject *) content->cost();
+            auto cost = (GlobalNamespace::CostAttribute *) content->cost();
             if (cost != nullptr) {
                 auto &map = Features::set0Prices::defaultValues;
                 if (map.find(cost) == map.end()) {
                     map[cost] = Features::set0Prices::DefaultCost{
                             cost->baseValue(),
-                            cost->valueIncrement(
-                            )};
+                            cost->valueIncrement()};
                 }
                 if (Features::set0Prices::isEnabled) {
                     cost->set_baseValue(0.0);
