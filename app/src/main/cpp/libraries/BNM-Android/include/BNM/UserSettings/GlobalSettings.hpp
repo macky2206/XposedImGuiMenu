@@ -121,7 +121,7 @@ inline void Unhook(PTR_T ptr) {
 
 
 // Dobby
-#include <../../../../Dobby/dobby.h>
+#include "../../../../Dobby/dobby.h"
 
 template<typename PTR_T, typename NEW_T, typename T_OLD>
 inline void *BasicHook(PTR_T ptr, NEW_T newMethod, T_OLD &oldBytes) {
