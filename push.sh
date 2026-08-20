@@ -11,26 +11,33 @@ else
     exit 1
 fi
 
-# Grab the commit message from the 1st argument
-COMMIT_MSG="$1"
-
-# If no message was provided, prompt for one
-if [ -z "$COMMIT_MSG" ]; then
-    read -rp "Enter commit message: " COMMIT_MSG
-fi
-
-# Exit if commit message is still empty
-if [ -z "$COMMIT_MSG" ]; then
-    echo "Aborted: Commit message cannot be empty."
-    exit 1
+# Auto-detect the commit message if not provided manually
+if [ -n "$1" ]; then
+    # Allow manual override if you type something like: push "hotfix"
+    COMMIT_MSG="$1"
+else
+    # Search git history for the most recent message starting with "cycle"
+    # and extract only the numbers from it.
+    LAST_CYCLE=$(git log --grep="^cycle[0-9]" -1 --pretty=%s | grep -oE '[0-9]+')
+    
+    # If no previous cycle commit is found, fallback to 10 since you are on 9
+    if [ -z "$LAST_CYCLE" ]; then
+        NEXT_CYCLE=10 
+    else
+        NEXT_CYCLE=$((LAST_CYCLE + 1))
+    fi
+    
+    COMMIT_MSG="cycle$NEXT_CYCLE"
 fi
 
 # 1. Stage all changes
 git add . || exit 1
 
-# 2. Show current status
+# 2. Show current status and the auto-generated message
 echo "--- Current Git Status in $PROJECT_DIR ---"
 git status
+echo "------------------------------------------"
+echo ">>> Next commit message: \"$COMMIT_MSG\" <<<"
 echo "------------------------------------------"
 
 # 3. Pause and wait for user keypress

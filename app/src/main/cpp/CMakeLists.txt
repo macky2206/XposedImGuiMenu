@@ -52,6 +52,14 @@ else ()
     set(OPENGL_LIB GLESv3)
 endif (${ANDROID_PLATFORM_LEVEL} LESS 12)
 
+# Define the Dobby static library
+add_library(dobby_static STATIC IMPORTED)
+
+# Point CMake to the exact location of libdobby.a based on the current CPU architecture
+set_target_properties(dobby_static PROPERTIES IMPORTED_LOCATION
+    ${CMAKE_CURRENT_SOURCE_DIR}/libraries/Dobby/${ANDROID_ABI}/libdobby.a
+)
+
 target_link_libraries(
         ${CMAKE_PROJECT_NAME}
         ${CURL_LIB}
