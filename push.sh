@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 # Set the target project directory
 PROJECT_DIR="/sdcard/proj/XposedImGuiMenu"
@@ -16,7 +16,7 @@ COMMIT_MSG="$1"
 
 # If no message was provided, prompt for one
 if [ -z "$COMMIT_MSG" ]; then
-    read -p "Enter commit message: " COMMIT_MSG
+    read -rp "Enter commit message: " COMMIT_MSG
 fi
 
 # Exit if commit message is still empty
