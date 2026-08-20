@@ -66,7 +66,7 @@ void *hack_thread(void *) {
 }
 
 void OnBNMLoaded() {
-    BNM_LOG_INFO(std::string(50, '=').c_str());
+    BNM_LOG_INFO("=========================================);
     BNM_LOG_INFO("BNM has been loaded");
 
     Features::freeShop::initHook();
@@ -78,7 +78,7 @@ void OnBNMLoaded() {
     // Features::RuneLevel::initHook();
     // Features::Expedition::initHook();
 
-    BNM_LOG_INFO(std::string(50, '=').c_str());
+    BNM_LOG_INFO("=========================================);
 }
 
 
