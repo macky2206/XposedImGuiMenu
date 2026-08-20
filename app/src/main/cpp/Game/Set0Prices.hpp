@@ -125,6 +125,7 @@ namespace Features {
     }// namespace set0Prices
 }// namespace Features
 
+/*
 struct StatUI : BNM::UnityEngine::MonoBehaviour {
     BNM_CustomClass(StatUI,
                     BNM::CompileTimeClassBuilder("", "StatUI").Build(),
@@ -221,3 +222,4 @@ struct SkillUI : BNM::UnityEngine::MonoBehaviour {
     BNM_CustomMethod(LateUpdate, false, BNM::Defaults::Get<void>(), "LateUpdate");
     BNM_CustomMethod(FixedUpdate, false, BNM::Defaults::Get<void>(), "FixedUpdate");
 };
+*/

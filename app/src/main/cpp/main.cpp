@@ -74,6 +74,7 @@ void *hack_thread(void *) {
         return (void *)il2cppScanner.findSymbol(name);
     }, nullptr);
 
+    BNM::Loading::AddOnLoadedEvent(OnBNMLoaded);
     BNM::Loading::AllowLateInitHook();
     BNM::Loading::TryLoadByUsersFinder();
 
