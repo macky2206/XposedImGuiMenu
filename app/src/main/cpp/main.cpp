@@ -34,6 +34,22 @@ EGLBoolean hook_eglSwapBuffers(EGLDisplay dpy, EGLSurface surface) {
     return old_eglSwapBuffers(dpy, surface);
 }
 
+void OnBNMLoaded() {
+    BNM_LOG_INFO("=========================================");
+    BNM_LOG_INFO("BNM has been loaded");
+
+    Features::freeShop::initHook();
+    // Features::SpeedHack::initHook();
+    // Features::SkillsHack::initHook();
+    // Features::LowestWave::initHook();
+    // Features::Equipment::initHook();
+    Features::set0Prices::initHook();
+    // Features::RuneLevel::initHook();
+    // Features::Expedition::initHook();
+
+    BNM_LOG_INFO("=========================================");
+}
+/*
 void *hack_thread(void *) {
     do {
         sleep(1);
@@ -64,36 +80,88 @@ void *hack_thread(void *) {
 
     return nullptr;
 }
+*/
+void *hack_thread(void *arg) {
+    BNM_LOG_INFO("[BNM Debug] Hack thread started, waiting for libil2cpp.so...");
 
-void OnBNMLoaded() {
-    BNM_LOG_INFO("=========================================");
-    BNM_LOG_INFO("BNM has been loaded");
+    // 1. Wait for the game to load IL2CPP into memory
+    void *il2cpp_handle = nullptr;
+    do {
+        sleep(1);
+        il2cpp_handle = dlopen("libil2cpp.so", RTLD_LAZY);
+    } while (!il2cpp_handle);
 
-    Features::freeShop::initHook();
-    // Features::SpeedHack::initHook();
-    // Features::SkillsHack::initHook();
-    // Features::LowestWave::initHook();
-    // Features::Equipment::initHook();
-    Features::set0Prices::initHook();
-    // Features::RuneLevel::initHook();
-    // Features::Expedition::initHook();
+    BNM_LOG_INFO("[BNM Debug] libil2cpp.so found! Handle: %p", il2cpp_handle);
 
-    BNM_LOG_INFO("=========================================");
+    // 2. Attach to JVM so BNM has JNI access internally
+    JNIEnv *env;
+    jvm->AttachCurrentThread(&env, nullptr);
+
+    // 3. Load BNM using the direct OS handle (Skips Java completely)
+    BNM::Loading::AddOnLoadedEvent(OnBNMLoaded);
+    BNM::Loading::AllowLateInitHook();
+    BNM::Loading::TryLoadByDlfcnHandle(il2cpp_handle);
+
+    // 4. Wait for BNM to finish unpacking
+    do {
+        sleep(1);
+    } while (!BNM::IsLoaded());
+    
+    BNM_LOG_INFO("[BNM Debug] BNM is fully loaded and ready!");
+
+    // 5. Continue with your Unity hooks
+    do {
+        sleep(1);
+        unityMaps = ElfScanner::createWithPath("libunity.so");
+    } while (!unityMaps.isValid());
+
+    RegisterNativeFn nativeInjectEventFn = KittyScanner::findRegisterNativeFn(unityMaps, "nativeInjectEvent");
+
+    if (nativeInjectEventFn.isValid()) {
+        HOOKD_ABS(nativeInjectEventFn.fnPtr, nativeInjectEvent);
+    } else {
+        LOGE("InjectEventPtr is dead, menu unable to initialize.");
+    }
+
+    Pointers();
+    InitPatches();
+    Hooks();
+
+    DobbyHookSM("libEGL.so", "eglSwapBuffers", (void *) hook_eglSwapBuffers, (void **) &old_eglSwapBuffers);
+
+    LOGI("Menu finished loading");
+
+    // Detach thread before exiting
+    jvm->DetachCurrentThread();
+    return nullptr;
 }
-
 
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
     JNIEnv *env;
     jvm = vm; // Store the JavaVM globally
     vm->GetEnv((void **) &env, JNI_VERSION_1_6);
     
-    BNM::Loading::AddOnLoadedEvent(OnBNMLoaded);
-    BNM::Loading::AllowLateInitHook();
-    BNM::Loading::TryLoadByJNI(env);
+    // BNM::Loading::AddOnLoadedEvent(OnBNMLoaded);
+    // BNM::Loading::AllowLateInitHook();
+    // BNM::Loading::TryLoadByJNI(env);
 
     return JNI_VERSION_1_6;
 }
 
+extern "C"
+JNIEXPORT void JNICALL
+Java_org_modfs_xposedmenu_Inject_startModMenu(JNIEnv *env, jclass clazz, jobject activityContext) {
+    int ret;
+    pthread_t ntid;
+    
+    // Just start the thread, no arguments needed
+    if ((ret = pthread_create(&ntid, nullptr, hack_thread, nullptr))) {
+        LOGE("can't create thread: %s\n", strerror(ret));
+    }
+}
+
+
+/*
 // 2. Added JNI Bridge: This catches the Activity from Inject.java
 extern "C"
 JNIEXPORT void JNICALL
@@ -123,3 +191,4 @@ Java_org_modfs_xposedmenu_Inject_startModMenu(JNIEnv *env, jclass clazz, jobject
         LOGE("can't create thread: %s\n", strerror(ret));
     }
 }
+*/
