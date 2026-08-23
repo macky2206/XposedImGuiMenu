@@ -41,7 +41,7 @@ find_library(egl EGL)
 find_library(GLESV2_LIB GLESv2)
 find_library(LZ_LIB z)
 
-if (${ANDROID_PLATFORM_LEVEL} LESS 12)
+if ("${ANDROID_PLATFORM_LEVEL}" LESS 12)
     message(FATAL_ERROR "OpenGL 2 is not supported before API level 11 /
                       (currently using ${ANDROID_PLATFORM_LEVEL}).")
     return()
